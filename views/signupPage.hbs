@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+
+
+
+<head>
+
+    <meta charset="utf-8" />
+    <title>Log in | Chatvia - Responsive Bootstrap 4 Chat App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Responsive Bootstrap 4 Chat App" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+
+    <!-- Bootstrap Css -->
+    <link href="/assets/css/bootstrap-dark.min.css" id="bootstrap-dark-style" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="/assets/css/app-dark.min.css" id="app-dark-style" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+
+
+
+</head>
+
+<body>
+
+    <div class="account-pages my-5 pt-sm-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="text-center mb-4">
+                        <a href="/" class="auth-logo mb-5 d-block">
+                            <img src="/assets/images/logo-dark.png" alt="" height="30" class="logo logo-dark">
+                            <img src="/assets/images/logo-light.png" alt="" height="30" class="logo logo-light">
+                        </a>
+
+                        <h4>Sign up</h4>
+                        <p class="text-muted mb-4">Get your Chatvia account now.</p>
+
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-4">
+                            <div class="p-3">
+                                <form action="/signup" id="sign-up" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label">Name</label>
+                                        <div class="input-group bg-soft-light rounded-3  mb-3">
+                                            <span class="input-group-text text-muted" id="basic-addon5">
+                                                <i class="ri-mail-line"></i>
+                                            </span>
+                                            <input type="text" name="Name"
+                                                class="form-control form-control-lg bg-soft-light border-light"
+                                                placeholder="Enter Name" aria-label="Enter Email"
+                                                aria-describedby="basic-addon5"><br>
+                                            
+                                        </div>
+                                       
+
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <div class="input-group bg-soft-light rounded-3  mb-3">
+                                            <span class="input-group-text text-muted" id="basic-addon5">
+                                                <i class="ri-mail-line"></i>
+                                            </span>
+                                            <input type="email" name="Email"
+                                                class="form-control form-control-lg bg-soft-light border-light"
+                                                placeholder="Enter Email" aria-label="Enter Email"
+                                                aria-describedby="basic-addon5"><br>
+                                            
+                                        </div>
+                                        {{#if emailErr}}
+                                            <p class="text-center text-danger"  id="mobileErr">{{emailErr}}
+                                            </p>
+                                            
+                                            {{/if}}
+
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Mobile</label>
+                                        <div class="input-group bg-soft-light mb-3 rounded-3">
+                                            <span class="input-group-text border-light text-muted" id="basic-addon6">
+                                                <i class="ri-user-2-line"></i>
+                                            </span>
+                                            <input type="number" name="Mobile"
+                                                class="form-control form-control-lg bg-soft-light border-light"
+                                                placeholder="Enter Mobile Number" aria-label="Enter Username"
+                                                aria-describedby="basic-addon6"><br>
+                                                
+                                        </div>
+                                        {{#if mobErr}}
+                                            <p class="text-center text-danger"  id="mobileErr">{{mobErr}}
+                                            </p>
+                                            
+                                            {{/if}}
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label">Password</label>
+                                        <div class="input-group bg-soft-light mb-3 rounded-3">
+                                            <span class="input-group-text border-light text-muted" id="basic-addon7">
+                                                <i class="ri-lock-2-line"></i>
+                                            </span>
+                                            <input type="password" name="Password"
+                                                class="form-control form-control-lg bg-soft-light border-light"
+                                                placeholder="Enter Password" aria-label="Enter Password"
+                                                aria-describedby="basic-addon7">
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary waves-effect waves-light" type="submit">Sign
+                                            up</button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 text-center">
+                        <p>Already have an account ? <a href="/" class="fw-medium text-primary"> Signin now </a> </p>
+                        <p>©
+                            <script>document.write(new Date().getFullYear())</script> Developed By <i
+                                class="mdi mdi-heart text-danger"></i> Harikrishnan U A
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end account-pages -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>"
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            $('#sign-up').validate({
+                rules: {
+                    Name:{
+                        required:true,
+                        minlength:4
+                    },
+                    Email: {
+                        email: true,
+                        required: true
+                    },
+                    Password: {
+                        required: true,
+                        minlength: 4
+                    },
+                    Mobile: {
+                        required: true,
+                        minlength: 10,
+                        maxlength: 10
+                    }
+
+                }
+                
+            })
+        })
+    </script>
+
+    <!-- JAVASCRIPT -->
+    {{!--
+    <script src="/assets/libs/jquery/jquery.min.js"></script> --}}
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src=/"assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="/assets/libs/node-waves/waves.min.js"></script>
+
+    <script src="/assets/js/app.js"></script>
+
+</body>
+
+
+</html>
