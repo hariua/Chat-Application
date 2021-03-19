@@ -5,7 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session')
 var db = require('./config/connection')
+var userHelper = require('./helper/userHelper')
+var moment = require('moment')
 var http = require('http');
+var fileupload = require('express-fileupload')
 var socketio = require('socket.io')
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
@@ -22,7 +25,7 @@ io.on('connection', socket=>
    {
      const user = userJoin(socket.id,sender,receiver)
      socket.join(receiver)
-    socket.emit('message',msgFormat.formatMessage(botName,'Welcome To Juschat'))
+    // socket.emit('message',msgFormat.formatMessage(botName,'Welcome To Juschat'))
   //  socket.broadcast.to(receiver).emit('message',msgFormat.formatMessage(botName,'A user Connected to Chat'))
    })
    
@@ -32,19 +35,34 @@ io.on('connection', socket=>
      console.log(user);
      let end = user.sender.length-25
      let sendUser = user.sender.slice(0,end)
+      let senderId = user.sender.slice(end,user.sender.length)
+      let dat= new Date()
+      let time =  moment(dat).format('h:mm a')
+      let date = moment(dat).format('YYYY/MM/DD')
 
     let receiveLen = user.receiver.length
     let firstId = user.receiver.slice((receiveLen-48),(receiveLen-24))
     let secondId = user.receiver.slice((receiveLen-24),(receiveLen))
     let receiveUser = user.receiver.slice(0,(receiveLen-48))
     let newReceiver = sendUser+secondId+firstId
-     io.to(user.receiver).emit('message',msgFormat.formatMessage(sendUser,msg))
+     io.to(user.receiver).emit('message',msgFormat.formatMessage('You',msg))
      io.to(newReceiver).emit('message',msgFormat.formatMessage(sendUser,msg))
+     let obj = {
+       message:msg,
+       sender:senderId.slice(0,senderId.length-1),
+       receiver:firstId,
+       time:time,
+       date:date,
+       senderName:sendUser,
+       receiverName:receiveUser
+     }
+     userHelper.insertChat(obj)
+
    }) 
-   socket.on('disconnect',()=>
-   {
-     io.emit('message',msgFormat.formatMessage(botName,'A user has left the Chat'))
-   })
+  //  socket.on('disconnect',()=>
+  //  {
+  //    io.emit('message',msgFormat.formatMessage(botName,'A user has left the Chat'))
+  //  })
  })
 var port = 3000;
 app.set('port', port);
@@ -65,7 +83,7 @@ app.use(
 
   })
   );
-
+app.use(fileupload())
   app.use(function (req, res, next) {
     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
     next();

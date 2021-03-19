@@ -17,6 +17,10 @@ socket.on('message', message => {
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault()
     const msg = e.target.elements.msg.value
+    // const img = e.target.files.files[0]
+    
+    
+    // console.log("files",img);
     socket.emit('chatMessage', msg)
     e.target.elements.msg.value = ''
     e.target.elements.msg.focus()

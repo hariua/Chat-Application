@@ -59,5 +59,23 @@ module.exports = {
       let users = await db.get().collection(collection.USER_COLLECTION).find({_id:{$ne:objectId(user)}}).toArray()
       resolve(users)
     })
+  },
+  insertChat:(chatData)=>
+  {
+    return new Promise((resolve,reject)=>
+    {
+      db.get().collection(collection.CHAT_COLLECTION).insertOne(chatData)
+      resolve()
+    })
+  },
+  getChat:(sender,receiver)=>
+  {
+    console.log(sender,receiver);
+    return new Promise(async(resolve,reject)=>
+    {
+      let chat = await db.get().collection(collection.CHAT_COLLECTION).find({sender:{$in:[sender,receiver]},receiver:{$in:[sender,receiver]}}).toArray()
+      resolve(chat)
+
+    })
   }
 }
