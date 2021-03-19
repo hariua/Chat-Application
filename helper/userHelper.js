@@ -1,5 +1,6 @@
 const { USER_COLLECTION } = require("../config/collection");
 var db = require("../config/connection");
+var objectId = require('mongodb').ObjectID
 var collection = require("../config/collection");
 var bcrypt = require("bcrypt");
 module.exports = {
@@ -34,6 +35,7 @@ module.exports = {
       if (user) {
         bcrypt.compare(userData.Password,user.Password).then((result) => {
           if (result) {
+            status.user = user
             status.success = true
             console.log("Login Success");
             resolve(status)
@@ -48,6 +50,14 @@ module.exports = {
         status.invalidUser = true
         resolve(status)
       }
+    })
+  },
+  getAllUsers:(user)=>
+  {
+    return new Promise(async(resolve,reject)=>
+    {
+      let users = await db.get().collection(collection.USER_COLLECTION).find({_id:{$ne:objectId(user)}}).toArray()
+      resolve(users)
     })
   }
 }

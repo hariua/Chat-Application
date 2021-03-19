@@ -3,16 +3,39 @@ var router = express.Router();
 var userHelper = require('../helper/userHelper')
 
 /* GET home page. */
+const verifyLogin = (req,res,next)=>
+{
+  if(req.session.loggedIn)
+  {
+    next()
+  }
+  else{
+    res.redirect('/')
+  }
+}
 router.get('/', function(req, res, next) {
-  res.render('loginPage',{'mob':req.session.logMob,'psd':req.session.logPsd});
+  if(req.session.loggedIn)
+  {
+    res.redirect('/allUsers')
+  }
+  else{
+    res.render('loginPage',{'mob':req.session.logMob,'psd':req.session.logPsd});
   req.session.logMob=false
   req.session.logPsd=false
+  }
 });
 router.get('/signup',(req,res)=>
 {
-  res.render('signupPage',{'mobErr':req.session.mob,'emailErr':req.session.email})
+  if(req.session.loggedIn)
+  {
+    res.redirect('/allUsers')
+  }
+  else{
+    res.render('signupPage',{'mobErr':req.session.mob,'emailErr':req.session.email})
   req.session.mob=false
   req.session.email=false
+  }
+  
 })
 router.post('/login',(req,res)=>
 {
@@ -22,7 +45,9 @@ router.post('/login',(req,res)=>
     if(result.success)
     {
       console.log("Success Login");
-      res.redirect('/chat')
+      req.session.user = result.user
+      req.session.loggedIn = true;
+      res.redirect('/allUsers')
     }
     if(result.invalidPassword)
     {
@@ -62,9 +87,20 @@ router.post('/signup',(req,res)=>
   })
 
 })
-router.get('/chat',(req,res)=>
+router.get('/chat',verifyLogin,(req,res)=>
 {
-  res.render('chat')
+  console.log("Recepient : ",req.query.receiver,"Sender : ",req.query.sender);
+  res.render('chat',{recepient:req.query.receiver})
 })
-
+router.get('/allUsers',verifyLogin,async(req,res)=>
+{
+  let users =await userHelper.getAllUsers(req.session.user._id)
+  res.render('allUsers',{users,sender:req.session.user})
+})
+router.get('/logout',(req,res)=>
+{
+  req.session.user=null
+  req.session.loggedIn=false
+  res.redirect('/')
+})
 module.exports = router;

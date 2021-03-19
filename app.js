@@ -5,12 +5,50 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session')
 var db = require('./config/connection')
-
+var http = require('http');
+var socketio = require('socket.io')
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
-
+var msgFormat = require('./chat/message')
+var {userJoin,getCurrentUser} = require('./chat/users')
 var app = express();
+var server = http.createServer(app);
+const io = socketio(server)
+const botName = 'Juschat Bot'
+io.on('connection', socket=>
+ {
+   
+   socket.on('joinChat',({sender,receiver})=>
+   {
+     const user = userJoin(socket.id,sender,receiver)
+     socket.join(receiver)
+    socket.emit('message',msgFormat.formatMessage(botName,'Welcome To Juschat'))
+  //  socket.broadcast.to(receiver).emit('message',msgFormat.formatMessage(botName,'A user Connected to Chat'))
+   })
+   
+   socket.on('chatMessage',msg =>
+   {
+     const user = getCurrentUser(socket.id)
+     console.log(user);
+     let end = user.sender.length-25
+     let sendUser = user.sender.slice(0,end)
 
+    let receiveLen = user.receiver.length
+    let firstId = user.receiver.slice((receiveLen-48),(receiveLen-24))
+    let secondId = user.receiver.slice((receiveLen-24),(receiveLen))
+    let receiveUser = user.receiver.slice(0,(receiveLen-48))
+    let newReceiver = sendUser+secondId+firstId
+     io.to(user.receiver).emit('message',msgFormat.formatMessage(sendUser,msg))
+     io.to(newReceiver).emit('message',msgFormat.formatMessage(sendUser,msg))
+   }) 
+   socket.on('disconnect',()=>
+   {
+     io.emit('message',msgFormat.formatMessage(botName,'A user has left the Chat'))
+   })
+ })
+var port = 3000;
+app.set('port', port);
+server.listen(port);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
