@@ -512,10 +512,21 @@
                                 <div class="ctext-wrap-content" style="padding-left:7px">
                                     <p class="conversation-name pt-1 pb-1" style="margin-bottom:0px;margin-left:0px">
                                         {{this.senderName}} :</p>
+                                    {{#if this.message}}
                                     <p class="mb-0" style="padding-left:20px">
                                         {{this.message}}
                                     </p>
-
+                                    {{/if}}
+                                    {{#if this.video}}
+                                    <video width="320" height="240" autoplay>
+                                        <source src="/chat-images/{{this.video}}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    {{/if}}
+                                    {{#if this.image}}
+                                    <img src="/chat-images/{{this.image}}"
+                                        style="width:350px;height:200px" class="img-responsive m-auto" alt="">
+                                    {{/if}}
                                     <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
                                         <span class="align-middle">{{this.time}} - {{this.date}}</span>
                                     </p>
@@ -552,12 +563,13 @@
                                             </li> --}}
                                             <li class="list-inline-item" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Attached File">
-                                                
-                                                    <div>
-                                                        <label for="files" class="btn"><i class="ri-attachment-line"></i></label>
-                                                        <input id="files" style="visibility:hidden;" type="file">
-                                                    </div>
-                                                
+
+                                                <div>
+                                                    <label for="upload_input" class="btn"><i
+                                                            class="ri-attachment-line"></i></label>
+                                                    <input id="upload_input" style="visibility:hidden;" type="file">
+                                                </div>
+
                                             </li>
                                             <li class="list-inline-item">
                                                 <button type="submit"
@@ -594,6 +606,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.9.6/qs.min.js"
         integrity="sha512-3TmPrquYLaAsUmZKXRARTDC5siWhLAdBVqNo4dWpDABBtLU62AaoTaQJEvjxjExcZYurO6i1dnK85k8pPIBlRg=="
         crossorigin="anonymous"></script>
+    <script src="/siofu/client.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../javascripts/main.js"></script>
     <script src="/assets/libs/jquery/jquery.min.js"></script>

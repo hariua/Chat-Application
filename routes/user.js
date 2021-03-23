@@ -79,6 +79,7 @@ router.get('/chat', verifyLogin, async (req, res) => {
   let receiveLen = req.query.receiver.length
   let receiver = req.query.receiver.slice((receiveLen - 48), (receiveLen - 24))
   let chat = await userHelper.getChat(sender, receiver)
+  console.log(chat);
   let len = req.query.receiver.length
   let user = req.query.receiver.slice(0, len - 48)
   res.render('chat', { recepient: user, chat })
