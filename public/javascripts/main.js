@@ -32,8 +32,14 @@ socket.emit('joinChat',{sender,receiver})
 socket.on('message', message => {
     console.log("client",socket.id);
     
-    console.log(message);  
-    outputMessage(message)
+    console.log(message); 
+    if(message.urlCheck)
+    {
+        urlText(message)
+    }else{
+        outputMessage(message)
+    }
+    
     chatMessages.scrollTop=chatMessages.scrollHeight
 })
 socket.on('file',data=>
@@ -83,6 +89,27 @@ function outputMessage(message) {
     <p class="mb-0" style="padding-left:20px">
         ${message.text}
     </p>
+    
+    <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
+        <span class="align-middle">${message.time}</span>
+    </p>
+    
+</div>`
+
+    var br = document.createElement("br");
+    
+    par[0].appendChild(br)
+    
+
+    document.querySelector('.testChat').appendChild(div)
+}
+function urlText(message) {
+    const par = document.getElementsByClassName('testChat')
+    const div = document.createElement('div')
+    div.classList.add('conversation-list')
+    div.innerHTML = `<div class="ctext-wrap-content" style="padding-left:7px">
+    <p class="conversation-name pt-1 pb-1" style="margin-bottom:0px;margin-left:0px">${message.userName} :</p>
+    <a href="https://${message.text}" target="_blank"><span class="text-white ml-2">${message.text}</span></a>
     
     <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
         <span class="align-middle">${message.time}</span>

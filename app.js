@@ -48,35 +48,59 @@ io.on('connection', socket => {
     let secondId = user.receiver.slice((receiveLen - 24), (receiveLen))
     let receiveUser = user.receiver.slice(0, (receiveLen - 48))
     let newReceiver = sendUser + secondId + firstId
-    io.to(user.receiver).emit('message', msgFormat.formatMessage('You', msg))
-    io.to(newReceiver).emit('message', msgFormat.formatMessage(sendUser, msg))
 
-    let obj = {
-      message: msg,
-      sender: senderId.slice(0, senderId.length - 1),
-      receiver: firstId,
-      time: time,
-      date: date,
-      senderName: sendUser,
-      receiverName: receiveUser
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); 
+     let urlCheck = !!pattern.test(msg)
+
+
+    io.to(user.receiver).emit('message', msgFormat.formatMessage('You',urlCheck,msg))
+    io.to(newReceiver).emit('message', msgFormat.formatMessage(sendUser,urlCheck,msg))
+    if(urlCheck)
+    {
+      let obj = {
+        url: msg,
+        sender: senderId.slice(0, senderId.length - 1),
+        receiver: firstId,
+        time: time,
+        date: date,
+        senderName: sendUser,
+        receiverName: receiveUser
+      }
+      userHelper.insertChat(obj)
+    }else{
+      let obj = {
+        message: msg,
+        sender: senderId.slice(0, senderId.length - 1),
+        receiver: firstId,
+        time: time,
+        date: date,
+        senderName: sendUser,
+        receiverName: receiveUser
+      }
+      userHelper.insertChat(obj)
     }
-    userHelper.insertChat(obj)
+    
 
   })
   socket.on('rec', blob => {
-    const user = getCurrentUser(socket.id)
-    console.log(user);
-    let end = user.sender.length - 25
-    let sendUser = user.sender.slice(0, end)
-    let senderId = user.sender.slice(end, user.sender.length)
-    let dat = new Date()
-    let time = moment(dat).format('h:mm a')
-    let date = moment(dat).format('YYYY/MM/DD')
-    let receiveLen = user.receiver.length
-    let firstId = user.receiver.slice((receiveLen - 48), (receiveLen - 24))
-    let secondId = user.receiver.slice((receiveLen - 24), (receiveLen))
-    let receiveUser = user.receiver.slice(0, (receiveLen - 48))
-    let newReceiver = sendUser + secondId + firstId
+    // const user = getCurrentUser(socket.id)
+    // console.log(user);
+    // let end = user.sender.length - 25
+    // let sendUser = user.sender.slice(0, end)
+    // let senderId = user.sender.slice(end, user.sender.length)
+    // let dat = new Date()
+    // let time = moment(dat).format('h:mm a')
+    // let date = moment(dat).format('YYYY/MM/DD')
+    // let receiveLen = user.receiver.length
+    // let firstId = user.receiver.slice((receiveLen - 48), (receiveLen - 24))
+    // let secondId = user.receiver.slice((receiveLen - 24), (receiveLen))
+    // let receiveUser = user.receiver.slice(0, (receiveLen - 48))
+    // let newReceiver = sendUser + secondId + firstId
     console.log("blob", blob);
     // io.to(newReceiver).emit('record', msgFormat.formatMessage(sendUser, blobUrl))
 

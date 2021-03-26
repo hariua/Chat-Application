@@ -1,11 +1,12 @@
  const moment = require('moment')
 
  module.exports={
-     formatMessage:(userName,text)=>
+     formatMessage:(userName,urlCheck,text)=>
      {
          return{
              userName,
              text,
+             urlCheck,
              time:moment().format('h:mm a')
          }
      },

@@ -650,6 +650,9 @@
                                         {{this.message}}
                                     </p>
                                     {{/if}}
+                                    {{#if this.url}}
+                                    <a href="https://{{this.url}}" target="_blank"><span class="text-white ml-2">{{this.url}}</span></a>
+                                    {{/if}}
                                     {{#if this.video}}
                                     <video width="320" height="240" controls>
                                         <source src="/chat-images/{{this.video}}" type="video/mp4">
