@@ -8,10 +8,16 @@ console.log(sender,receiver);
 const socket = io.connect()
 var siofu = new SocketIOFileUpload(socket);
 siofu.listenOnInput(document.getElementById("upload_input"));
+function blobFunVideo(blob)
+{
+    socket.emit('rec',blob)
+}
+
 
 siofu.addEventListener("progress", function(event){
     var percent = event.bytesLoaded / event.file.size * 100;
     console.log("File is", percent.toFixed(2), "percent loaded");
+    progressDisplay(percent.toFixed(2))
 });
 
 // Do something when a file is uploaded:
@@ -42,6 +48,14 @@ socket.on('file',data=>
     {
         videoFile(data)
     }
+    if(data.extention == '.mp3'|| data.extention == '.webm')
+    {
+        audioFile(data)
+    }
+})
+socket.on('record',data=>{
+    console.log("rec received",data);
+    recordAudio(data)
 })
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -54,7 +68,12 @@ chatForm.addEventListener('submit', (e) => {
     e.target.elements.msg.value = ''
     e.target.elements.msg.focus()
 }) 
-
+function progressDisplay(percent)
+{
+    var bar = document.getElementById('myBar')
+    bar.style.width=percent+"%"
+   document.getElementById('progressText').innerHTML=percent+"%"
+}
 function outputMessage(message) {
     const par = document.getElementsByClassName('testChat')
     const div = document.createElement('div')
@@ -107,10 +126,35 @@ function videoFile(data) {
     div.classList.add('conversation-list')
     div.innerHTML = `<div class="ctext-wrap-content" style="padding-left:7px">
     <p class="conversation-name pt-1 pb-1" style="margin-bottom:0px;margin-left:0px">${data.userName} :</p>
-    <video width="320" height="240" autoplay >
+    <video width="320" height="240" controls >
   <source src="http://localhost:3000/chat-images/${data.file}" type="video/mp4">
 Your browser does not support the video tag.
 </video>
+    
+    <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
+        <span class="align-middle">${data.time}</span>
+    </p>
+    
+</div>`
+
+    var br = document.createElement("br");
+    
+    par[0].appendChild(br)
+    
+
+    document.querySelector('.testChat').appendChild(div)
+}
+function audioFile(data) {
+
+    const par = document.getElementsByClassName('testChat')
+    const div = document.createElement('div')
+    div.classList.add('conversation-list')
+    div.innerHTML = `<div class="ctext-wrap-content" style="padding-left:7px">
+    <p class="conversation-name pt-1 pb-1" style="margin-bottom:0px;margin-left:0px">${data.userName} :</p>
+    <audio controls >
+  <source src="http://localhost:3000/chat-images/${data.file}" type="video/mp4">
+Your browser does not support the video tag.
+</audio>
     
     <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
         <span class="align-middle">${data.time}</span>

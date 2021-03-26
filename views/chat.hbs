@@ -8,6 +8,7 @@
 
     <meta charset="utf-8" />
     <title>Chat | Chatvia - Responsive Bootstrap 4 Chat App</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src http://*; child-src 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Responsive Bootstrap 4 Chat App" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -25,11 +26,143 @@
     <!-- Bootstrap Css -->
     <link href="/assets/css/bootstrap-dark.min.css" id="bootstrap-dark-style" rel="stylesheet" type="text/css" />
     <link href="/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+        integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
     <!-- Icons Css -->
     <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <!-- App Css-->
     <link href="/assets/css/app-dark.min.css" id="app-dark-style" rel="stylesheet" type="text/css" />
     <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <script>
+        function hasGetUserMedia() {
+            return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        }
+        if (hasGetUserMedia()) {
+            // Good to go!
+
+        } else {
+            alert("getUserMedia() is not supported by your browser");
+        }
+    </script>
+    <script>
+
+        function permissionVoice() {
+
+
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+            const context = new AudioContext();
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                const chunks = [];
+                // create media recorder instance to initialize recording
+                const recorder = new MediaRecorder(stream);
+                // function to be called when data is received
+                recorder.ondataavailable = e => {
+                    // add stream data to chunks
+                    chunks.push(e.data);
+                    // if recorder is 'inactive' then recording has finished
+                    if (recorder.state == 'inactive') {
+                        // convert stream data chunks to a 'webm' audio format as a blob
+                        const blob = new Blob(chunks, { type: 'audio/mp3' });
+                        // convert blob to URL so it can be assigned to a audio src attribute
+                        { { !--blobFunAudio(blob) --} }
+                        console.log(typeof (blob))
+                        createAudioElement(URL.createObjectURL(blob));
+
+
+
+                    }
+                };
+                // start recording with 1 second time between receiving 'ondataavailable' events
+                recorder.start(1000);
+                // setTimeout to stop recording after 4 seconds
+                setTimeout(() => {
+                    // this will trigger one final 'ondataavailable' event and set recorder state to 'inactive'
+                    recorder.stop();
+                }, 5000);
+            });
+
+        }
+        function createAudioElement(blobUrl) {
+            const downloadEl = document.createElement('a');
+
+            downloadEl.innerHTML = 'download';
+            downloadEl.download = 'audio.mp3';
+            downloadEl.href = blobUrl;
+            const audioEl = document.createElement('audio');
+            audioEl.controls = true;
+            audioEl.id = "recorded-audio"
+            const sourceEl = document.createElement('source');
+            sourceEl.src = blobUrl;
+            sourceEl.type = 'audio/mp3';
+            audioEl.appendChild(sourceEl);
+            document.body.appendChild(audioEl);
+
+
+
+
+        }
+        function permissionVideo() {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+            const context = new AudioContext();
+
+            navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
+                const chunks = [];
+                // create media recorder instance to initialize recording
+                const recorder = new MediaRecorder(stream);
+                // function to be called when data is received
+                recorder.ondataavailable = e => {
+                    // add stream data to chunks
+                    chunks.push(e.data);
+                    // if recorder is 'inactive' then recording has finished
+                    if (recorder.state == 'inactive') {
+                        // convert stream data chunks to a 'webm' audio format as a blob
+                        const blob = new Blob(chunks, { type: 'video/mp4' });
+                        // convert blob to URL so it can be assigned to a audio src attribute
+                        blobFunVideo(blob)
+                        console.log(typeof (blob))
+                        createVideoElement(URL.createObjectURL(blob));
+
+
+
+                    }
+                };
+                // start recording with 1 second time between receiving 'ondataavailable' events
+                recorder.start(1000);
+                // setTimeout to stop recording after 4 seconds
+                setTimeout(() => {
+                    // this will trigger one final 'ondataavailable' event and set recorder state to 'inactive'
+                    recorder.stop();
+                }, 5000);
+            });
+
+        }
+        function createVideoElement(blobUrl) {
+            const downloadE1 = document.createElement('a');
+
+            downloadE1.innerHTML = 'download';
+            downloadE1.download = 'video.mp4';
+            downloadE1.href = blobUrl;
+            const videoEl = document.createElement('video');
+            videoEl.controls = true;
+            videoEl.id = "recorded-video"
+            const sourceEl = document.createElement('source');
+            sourceEl.src = blobUrl;
+            sourceEl.type = 'video/mp4';
+            videoEl.appendChild(sourceEl);
+            document.body.appendChild(videoEl);
+
+
+
+
+        }
+
+
+    </script>
+
 
 
 </head>
@@ -518,14 +651,20 @@
                                     </p>
                                     {{/if}}
                                     {{#if this.video}}
-                                    <video width="320" height="240" autoplay>
+                                    <video width="320" height="240" controls>
                                         <source src="/chat-images/{{this.video}}" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     {{/if}}
                                     {{#if this.image}}
-                                    <img src="/chat-images/{{this.image}}"
-                                        style="width:350px;height:200px" class="img-responsive m-auto" alt="">
+                                    <img src="/chat-images/{{this.image}}" style="width:350px;height:200px"
+                                        class="img-responsive m-auto" alt="">
+                                    {{/if}}
+                                    {{#if this.audio}}
+                                    <audio controls>
+                                        <source src="/chat-images/{{this.audio}}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </audio>
                                     {{/if}}
                                     <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i>
                                         <span class="align-middle">{{this.time}} - {{this.date}}</span>
@@ -535,7 +674,13 @@
 
                             </div><br>
                             {{/each}}
+
                         </div>
+                    </div>
+                    <div class="col progress" id="progressBar">
+                        <div id="myBar"
+                            style="width: 0%;height: 30px;background-color: #4CAF50;text-align: center;line-height: 30px;color: white;"><span class="" id="progressText" style="margin: 20px;"></span>
+                            </div>
                     </div>
                     <!-- end chat conversation end -->
 
@@ -551,16 +696,22 @@
                                         placeholder="Enter Message...">
 
                                 </div>
+
                                 <div class="col-auto">
                                     <div class="chat-input-links ms-md-2 me-md-0">
                                         <ul class="list-inline mb-0">
-                                            {{!-- <li class="list-inline-item" data-bs-toggle="tooltip"
+                                            <li class="list-inline-item" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Emoji">
-                                                <button type="button"
-                                                    class="btn btn-link text-decoration-none font-size-16 btn-lg waves-effect">
-                                                    <i class="ri-emotion-happy-line"></i>
-                                                </button>
-                                            </li> --}}
+                                                <div>
+                                                    <label for="voice-record" onclick="permissionVoice()" class="btn"><i
+                                                            class="fas fa-microphone"></i></label>
+                                                    <label><i class="fas fa-camera"
+                                                            onclick="permissionVideo()"></i></label>
+                                                    {{!-- <input id="voice-record" style="visibility:hidden;"
+                                                        type="file"> --}}
+
+                                                </div>
+                                            </li>
                                             <li class="list-inline-item" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Attached File">
 

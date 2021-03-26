@@ -12,10 +12,12 @@ var fs = require('fs')
 var fileupload = require('express-fileupload')
 var SocketIOFileUpload = require('socketio-file-upload')
 var socketio = require('socket.io')
+var ffmpeg = require('ffmpeg')
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
 var msgFormat = require('./chat/message')
-var { userJoin, getCurrentUser } = require('./chat/users')
+var { userJoin, getCurrentUser } = require('./chat/users');
+const e = require('express');
 var app = express();
 var server = http.createServer(app);
 const io = socketio(server)
@@ -48,7 +50,7 @@ io.on('connection', socket => {
     let newReceiver = sendUser + secondId + firstId
     io.to(user.receiver).emit('message', msgFormat.formatMessage('You', msg))
     io.to(newReceiver).emit('message', msgFormat.formatMessage(sendUser, msg))
-    
+
     let obj = {
       message: msg,
       sender: senderId.slice(0, senderId.length - 1),
@@ -59,6 +61,24 @@ io.on('connection', socket => {
       receiverName: receiveUser
     }
     userHelper.insertChat(obj)
+
+  })
+  socket.on('rec', blob => {
+    const user = getCurrentUser(socket.id)
+    console.log(user);
+    let end = user.sender.length - 25
+    let sendUser = user.sender.slice(0, end)
+    let senderId = user.sender.slice(end, user.sender.length)
+    let dat = new Date()
+    let time = moment(dat).format('h:mm a')
+    let date = moment(dat).format('YYYY/MM/DD')
+    let receiveLen = user.receiver.length
+    let firstId = user.receiver.slice((receiveLen - 48), (receiveLen - 24))
+    let secondId = user.receiver.slice((receiveLen - 24), (receiveLen))
+    let receiveUser = user.receiver.slice(0, (receiveLen - 48))
+    let newReceiver = sendUser + secondId + firstId
+    console.log("blob", blob);
+    // io.to(newReceiver).emit('record', msgFormat.formatMessage(sendUser, blobUrl))
 
   })
   // Do something when a file is saved:
@@ -78,26 +98,23 @@ io.on('connection', socket => {
     let secondId = user.receiver.slice((receiveLen - 24), (receiveLen))
     let receiveUser = user.receiver.slice(0, (receiveLen - 48))
     let newReceiver = sendUser + secondId + firstId
-    var file = path.join(__dirname, '/public/chat-images/'+event.file.name)
+    var file = path.join(__dirname, '/public/chat-images/' + event.file.name)
     var ext = path.extname(file)
     console.log(ext);
-    var fileTime=moment(dat).format('hmmss')
+    var fileTime = moment(dat).format('hmmss')
     var fileDate = moment(dat).format('YYYYMMDD')
-    var fileName = newReceiver+fileTime+fileDate+ext
-    var fileNew = path.join(__dirname, '/public/chat-images/',fileName)
+    var fileName = newReceiver + fileTime + fileDate + ext
+    var fileNew = path.join(__dirname, '/public/chat-images/', fileName)
     console.log(fileNew);
-    fs.rename(file,fileNew,(err)=>
-    {
-      if(err)
-      {
-        console.log("Err",err);
+    fs.rename(file, fileNew, (err) => {
+      if (err) {
+        console.log("Err", err);
       }
     })
-    event.file.name=fileName
-    io.to(user.receiver).emit('file', msgFormat.formatFileMessage('You',fileName,ext))
-    io.to(newReceiver).emit('file', msgFormat.formatFileMessage(sendUser,fileName,ext))
-    if(ext == '.jpg'|| ext == '.jpeg'|| ext == '.png')
-    {
+    event.file.name = fileName
+    io.to(user.receiver).emit('file', msgFormat.formatFileMessage('You', fileName, ext))
+    io.to(newReceiver).emit('file', msgFormat.formatFileMessage(sendUser, fileName, ext))
+    if (ext == '.jpg' || ext == '.jpeg' || ext == '.png') {
       let obj = {
         image: fileName,
         sender: senderId.slice(0, senderId.length - 1),
@@ -109,8 +126,7 @@ io.on('connection', socket => {
       }
       userHelper.insertChat(obj)
     }
-    if(ext == '.mp4'|| ext == '.mpeg'|| ext == '.mkv')
-    {
+    if (ext == '.mp4' || ext == '.mpeg' || ext == '.mkv') {
       let obj = {
         video: fileName,
         sender: senderId.slice(0, senderId.length - 1),
@@ -122,7 +138,19 @@ io.on('connection', socket => {
       }
       userHelper.insertChat(obj)
     }
-    
+    if (ext == '.mp3' || ext == '.webm') {
+      let obj = {
+        audio: fileName,
+        sender: senderId.slice(0, senderId.length - 1),
+        receiver: firstId,
+        time: time,
+        date: date,
+        senderName: sendUser,
+        receiverName: receiveUser
+      }
+      userHelper.insertChat(obj)
+    }
+
   });
 
   //  socket.on('disconnect',()=>
